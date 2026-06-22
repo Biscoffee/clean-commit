@@ -35,26 +35,65 @@ It binds to the **process**, not to anyone's setup — branch, remote, commit co
 | 7 | **Verify before committing** | Runs the project's tests/build when one exists and is cheap |
 | 8 | **Push / PR only when asked** | Never pushes, force-pushes, or rewrites history unsolicited |
 
-## Example
+## Full example
+
+A realistically messy working tree — a feature change, an accidental secret and log, and you're standing on `main`:
 
 ```
-You: 提交一下这些改动
+You: I finished password reset, commit it and push
 
 clean-commit:
-  • repo ✓   branch: feature/reset-password   remote: origin
-  • diff: 2 files (auth/reset.ts, auth/reset.test.ts)
-  • secret scan: clean
-  • convention: commitlint.config.js found → Conventional Commits enforced
-  • existing style: feat(scope): … in English
+  1) env     git repo ✓   identity dev <dev@acme.io> ✓   branch main   remote origin
+             ⚠ you're on main and want to push — suggest a feature branch first
+  2) changes 4 files, git diff --check clean (no conflicts/whitespace):
+               src/auth/reset.ts        +58
+               src/auth/reset.test.ts   +40
+               .env                     new   ← contains a secret
+               debug.log                new   ← scratch file
+  3) secrets .env matches API_KEY → blocked, not committed, suggest .gitignore
+  4) junk    debug.log is scratch → not committed, suggest gitignore
+  5) split   the two remaining files are one feature → one commit
+  6) style   history is feat(scope): in English + commitlint enforced → Conventional Commits
 
-  Proposed commit:
-    feat(auth): add password-reset flow
+  Suggested steps:
+    git switch -c feat/password-reset
+    printf '.env\ndebug.log\n' >> .gitignore && git add .gitignore
+    git add src/auth/reset.ts src/auth/reset.test.ts
+    git commit -m "feat(auth): add password-reset flow
 
-    Send a one-time token by email and verify it before allowing a
-    new password. Covered by reset.test.ts.
+    Email a one-time token and verify it before allowing a new
+    password. Covered by reset.test.ts."
 
-  Tests: `npm test` → 14 passing
-  Committed. (not pushed — say "push" when you're ready)
+  7) verify  npm test → 14 passing ✓
+  8) push    git fetch: not behind → git push -u origin feat/password-reset
+             want me to open a PR too? (gh pr create)
+
+I only run it after you confirm.
+```
+
+## What it does in each situation
+
+| Situation | What clean-commit does |
+|---|---|
+| Not in a git repo | Explains and stops |
+| Mid merge / rebase / cherry-pick | Stops; helps you finish or abort first |
+| `user.name`/`email` unset or bogus | Stops; asks you to set it first |
+| On `main`/`master` and pushing | Warns and suggests a feature branch first |
+| A secret / `.env` in the diff | Blocks, suggests gitignore, won't commit |
+| Leftover conflict markers / trailing whitespace | Caught by `git diff --check`; fix before committing |
+| Nothing changed | Says "nothing to commit" instead of spinning |
+| A large / binary file added | Suggests Git LFS or exclusion |
+| Repo enforces Conventional Commits | Writes the message precisely per CC v1.0.0 |
+| A pile of wip/fixup commits before a PR | Offers to squash them tidy |
+| Local branch behind the remote | `pull --rebase` before pushing, never force |
+| Tests fail | Reports with output; won't commit on a broken build |
+
+## Tests
+
+The repo ships [`test/run.sh`](test/run.sh), which builds a throwaway repo for each situation above and verifies the probe signals the skill relies on. It doesn't test Claude's judgment (that's the prompt) but it guarantees the git commands the workflow references produce the expected signal in every scenario:
+
+```sh
+bash test/run.sh   # expect: Total: 12 passed, 0 failed
 ```
 
 ## Conventional Commits, done right
@@ -98,6 +137,7 @@ To scope it to a single project instead of globally, point it at `<project>/.cla
 
 - [`clean-commit/SKILL.md`](clean-commit/SKILL.md) — the skill itself (frontmatter + workflow + Conventional Commits appendix)
 - [`design-notes.md`](design-notes.md) — the design thinking: what a Skill is, private vs distributable skills, and why this one targets general programmers
+- [`test/run.sh`](test/run.sh) — scenario tests
 - [`README.md`](README.md) — 中文说明
 
 ## License

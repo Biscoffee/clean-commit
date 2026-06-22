@@ -35,26 +35,65 @@
 | 7 | **提交前验证** | 探测到项目的测试/构建且代价不高时先跑一遍 |
 | 8 | **仅在你要求时 push/PR** | 绝不擅自 push、force-push 或改写历史 |
 
-## 示例
+## 完整示例
+
+一个真实的混乱工作区——改了功能、又夹带了密钥和日志、人还正站在 `main` 上：
 
 ```
-你: 提交一下这些改动
+你: 我写完密码重置了，提交并推上去
 
 clean-commit:
-  • 仓库 ✓   分支: feature/reset-password   远程: origin
-  • diff: 2 个文件 (auth/reset.ts, auth/reset.test.ts)
-  • 密钥扫描: 干净
-  • 约定: 发现 commitlint.config.js → 强制约定式提交
-  • 已有风格: feat(scope): … 英文
+  ① 环境   git 仓库 ✓   身份 dev <dev@acme.io> ✓   分支 main   远程 origin
+           ⚠ 你在 main 上且要 push —— 建议先建特性分支
+  ② 改动   4 个文件，git diff --check 无冲突/空白问题：
+             src/auth/reset.ts        +58
+             src/auth/reset.test.ts   +40
+             .env                     新增  ← 含密钥
+             debug.log                新增  ← 临时文件
+  ③ 密钥   .env 命中 API_KEY → 拦下，不提交，建议加入 .gitignore
+  ④ 垃圾   debug.log 是临时文件 → 不提交，建议 gitignore
+  ⑤ 切分   剩余两个文件属同一功能 → 合为 1 个提交
+  ⑥ 规范   历史是 feat(scope): 英文 + commitlint 强制 → 按约定式提交
 
-  拟提交:
-    feat(auth): add password-reset flow
+  我建议这样执行：
+    git switch -c feat/password-reset
+    printf '.env\ndebug.log\n' >> .gitignore && git add .gitignore
+    git add src/auth/reset.ts src/auth/reset.test.ts
+    git commit -m "feat(auth): add password-reset flow
 
-    Send a one-time token by email and verify it before allowing a
-    new password. Covered by reset.test.ts.
+    Email a one-time token and verify it before allowing a new
+    password. Covered by reset.test.ts."
 
-  测试: `npm test` → 14 passing
-  已提交。（未 push——准备好了说一声 "push"）
+  ⑦ 验证   npm test → 14 passing ✓
+  ⑧ 推送   git fetch：未落后 → git push -u origin feat/password-reset
+           要我顺手开个 PR 吗？(gh pr create)
+
+确认后我才执行。
+```
+
+## 各种情况下它怎么做
+
+| 情况 | clean-commit 的反应 |
+|---|---|
+| 不在 git 仓库 | 说明并停下 |
+| 处于 merge / rebase / cherry-pick 中途 | 停下，先帮你完成或中止 |
+| `user.name`/`email` 没配或离谱 | 停下，先让你设置 |
+| 在 `main`/`master` 上要 push | 提醒并建议先建特性分支 |
+| diff 里有密钥 / `.env` | 拦下，建议 gitignore，不提交 |
+| 残留冲突标记 / 行尾空白 | `git diff --check` 揪出，先修再提交 |
+| 没有任何改动 | 直接说「无可提交」，不空转 |
+| 加入超大 / 二进制文件 | 提醒走 Git LFS 或排除 |
+| 仓库强制约定式提交 | 按 CC v1.0.0 精确生成 message |
+| 一堆 wip/fixup 提交要开 PR | 提议 squash 整理 |
+| 本地落后于远程 | 先 `pull --rebase` 再 push，绝不 force |
+| 测试失败 | 带输出报告，不在坏构建上提交 |
+
+## 测试
+
+仓库自带 [`test/run.sh`](test/run.sh)，为上面每种情况搭建临时仓库、校验 skill 依赖的探测信号。它不测 Claude 的判断（那是 prompt 的事），但保证流程引用的 git 命令在各场景下确实给出预期信号：
+
+```sh
+bash test/run.sh   # 预期输出 Total: 12 passed, 0 failed
 ```
 
 ## 约定式提交，做得准确
@@ -98,6 +137,7 @@ cp -r ~/clean-commit/clean-commit ~/.claude/skills/clean-commit
 
 - [`clean-commit/SKILL.md`](clean-commit/SKILL.md) —— skill 本体（frontmatter + 流程 + 约定式提交附录）
 - [`design-notes.md`](design-notes.md) —— 设计思考：Skill 是什么、私人 vs 可分发 Skill、为何面向泛程序员
+- [`test/run.sh`](test/run.sh) —— 各情况场景测试
 - [`README.en.md`](README.en.md) —— English README
 
 ## 许可证

@@ -10,15 +10,16 @@
 
 ## 能做什么
 
-- **提交前体检环境**：确认是 git 仓库，识别当前分支/远程，发现 merge·rebase·cherry-pick 中途或 detached HEAD 就停下
-- **读懂你的改动**：逐处看 diff，绝不 `git add .` 一把梭；无改动时直接告诉你、不空转
+- **提交前体检环境**：确认是 git 仓库、提交身份（`user.name`/`email`）正常，识别当前分支/远程，发现 merge·rebase·cherry-pick 中途或 detached HEAD 就停下
+- **读懂你的改动**：逐处看 diff，绝不 `git add .` 一把梭；用 `git diff --check` 揪出冲突残留标记与空白错误；无改动时直接告诉你、不空转
 - **拦截密钥**：扫描 token·key·`.env`·密码·私钥，可能泄露就停下报警
-- **挡掉垃圾文件**：日志·调试·构建产物不进提交
+- **挡掉垃圾与大文件**：日志·调试·构建产物不进提交；超大/二进制文件提醒走 Git LFS 或排除
 - **逻辑切分**：把混在一起的改动拆成多个内聚、可独立回滚的提交
 - **跟随你仓库的 message 风格**：自动识别语言、是否约定式提交、有无 body 并照做
 - **约定式提交精确执行**：检测到 `commitlint`/`commitizen` 等强制约定时，按 CC v1.0.0 / Angular / SemVer / RFC 2119 生成规范 message
-- **提交前验证**：探测 `package.json`/`Cargo.toml`/`Makefile` 等跑测试或构建
-- **克制地推送**：默认只本地提交；push/PR 要你明确开口；在主分支上要推先建议建特性分支
+- **按需补 footer**：分支名带 Issue 号就关联 `Closes`/`Refs #`；仓库要求 DCO 时加 `Signed-off-by`
+- **提交前验证**：尊重并跑 pre-commit 钩子；探测 `package.json`/`Cargo.toml`/`Makefile` 等跑测试或构建
+- **克制地推送**：默认只本地提交；push/PR 要你明确开口；主分支上要推先建议建特性分支（按仓库命名习惯）
 - **规范开 PR**：用 `gh`/`glab`，PR 描述讲清改了什么·为什么·怎么验证
 
 ## 8 步流程

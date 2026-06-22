@@ -10,15 +10,16 @@ It binds to the **process**, not to anyone's setup — branch, remote, commit co
 
 ## What it can do
 
-- **Health-check the environment first** — confirms it's a git repo, reads the current branch/remote, and stops on an in-progress merge·rebase·cherry-pick or a detached HEAD
-- **Understand your changes** — reads the diff hunk by hunk, never `git add .` blindly, and tells you when there's nothing to commit instead of spinning
+- **Health-check the environment first** — confirms it's a git repo and that the commit identity (`user.name`/`email`) is sane, reads the current branch/remote, and stops on an in-progress merge·rebase·cherry-pick or a detached HEAD
+- **Understand your changes** — reads the diff hunk by hunk, never `git add .` blindly, runs `git diff --check` for leftover conflict markers and whitespace errors, and tells you when there's nothing to commit instead of spinning
 - **Intercept secrets** — scans for tokens·keys·`.env`·passwords·private keys and stops if one would leak
-- **Keep junk out** — logs, debug output, and build artifacts stay out of the commit
+- **Keep junk and big blobs out** — logs, debug output, and build artifacts stay out; oversized/binary files are flagged for Git LFS or exclusion
 - **Split logically** — breaks mixed changes into coherent commits that each revert on their own
 - **Follow your repo's message style** — detects language, Conventional-Commits usage, and body habits, then matches them
 - **Apply Conventional Commits precisely** — when `commitlint`/`commitizen`/etc. enforce it, writes messages per CC v1.0.0 / Angular / SemVer / RFC 2119
-- **Verify before committing** — probes `package.json`/`Cargo.toml`/`Makefile` and runs tests or a build
-- **Push with restraint** — commits locally by default; push/PR only when you ask; suggests a feature branch before pushing from the default branch
+- **Add footers when appropriate** — links issues (`Closes`/`Refs #`) from the branch name, and adds a DCO `Signed-off-by` when the repo requires it
+- **Verify before committing** — respects and runs pre-commit hooks, and probes `package.json`/`Cargo.toml`/`Makefile` to run tests or a build
+- **Push with restraint** — commits locally by default; push/PR only when you ask; suggests a feature branch (named in the repo's style) before pushing from the default branch
 - **Open PRs cleanly** — via `gh`/`glab`, with a description covering what changed, why, and how it was verified
 
 ## The 8-step workflow

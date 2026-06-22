@@ -13,14 +13,16 @@ Run the steps in order. Stop and surface the problem if any check fails — neve
 
 - Confirm this is a git repo (`git rev-parse --is-inside-work-tree`). If not, say so and stop.
 - **Check for an operation in progress** — a merge, rebase, or cherry-pick (look for `.git/MERGE_HEAD`, `.git/rebase-merge`, `.git/rebase-apply`, `.git/CHERRY_PICK_HEAD`, or the hint in `git status`). If one is underway, **stop**: help the user finish or abort it first, never stack a fresh commit on top of a half-done operation.
+- **Check the commit identity** — `git config user.name` and `git config user.email` must be set and plausible (not empty, not a placeholder like `root@localhost` or `you@example.com`). If they're missing or look wrong, stop and ask before committing — wrong authorship is painful to rewrite later.
 - Read current branch (`git branch --show-current`) and whether a remote exists (`git remote -v`). Note a detached HEAD and warn before committing onto it.
-- If on the default branch (`main`/`master`) **and** the user wants to push, warn and offer to create a feature branch first. Local-only commits on the default branch are fine.
+- If on the default branch (`main`/`master`) **and** the user wants to push, warn and offer to create a feature branch first. **Name the branch in the repo's existing style** (inspect `git branch -a`); absent a signal, use `<type>/<short-kebab-summary>` aligned with the commit type, e.g. `feat/password-reset`. Local-only commits on the default branch are fine.
 
 ## 2. See exactly what changed
 
 - Run `git status` and `git diff` (plus `git diff --staged` if anything is already staged).
 - **If there is nothing to commit** (no staged, unstaged, or untracked changes), say so and stop — don't create an empty commit.
 - Actually read the diff and understand each change. **Never `git add .` blindly** — you must be able to explain what every staged hunk does.
+- **Catch leftover conflict markers and whitespace errors** — run `git diff --check`; if it flags conflict markers (`<<<<<<<` / `=======` / `>>>>>>>`) or trailing-whitespace / end-of-file issues, stop and fix them before staging.
 - If the changes mix unrelated concerns, note that for step 5.
 
 ## 3. Self-check for secrets
@@ -31,6 +33,7 @@ Run the steps in order. Stop and surface the problem if any check fails — neve
 ## 4. Drop temporary files
 
 - Identify scratch/diagnostic/build artifacts that crept into the changes (probe scripts, `*.log`, `*.tmp`, debug dumps, editor junk). Don't stage them; suggest deleting or gitignoring.
+- **Flag large or binary files** being added (say, larger than a few MB): confirm they truly belong in git, and otherwise suggest Git LFS or a `.gitignore` entry — large blobs bloat the history permanently.
 
 ## 5. Split into logical commits
 
@@ -45,9 +48,12 @@ Run the steps in order. Stop and surface the problem if any check fails — neve
 - **When the repo uses (or enforces) Conventional Commits**, apply the rules in the Appendix precisely: correct `type`, optional `scope`, imperative-mood summary, and `!`/`BREAKING CHANGE:` for breaking changes.
 - The body (when warranted) explains **why** the change was made and **how it was verified** — not a restatement of the diff.
 - Do **not** add a `Co-Authored-By` trailer by default. Add one only if the user asks, or if the repo's own history clearly does it on every commit.
+- **Link the issue when the workflow does** — if the branch name embeds an issue id (`feat/123-…`, `fix/PROJ-42-…`) and the repo links issues, add a footer: `Closes #123` when this change fully resolves it, otherwise `Refs #123`. Confirm before using `Closes`.
+- **Add a DCO sign-off only if the repo requires it** — if `Signed-off-by:` runs through the history, or a DCO / `CONTRIBUTING` file asks for it, sign with `git commit -s`. This is separate from `Co-Authored-By` and is not added otherwise.
 
 ## 7. Verify before committing
 
+- **Respect pre-commit hooks** — if the repo has them (`.husky/`, `.pre-commit-config.yaml`, or a configured `core.hooksPath`), let them run on commit. If a hook reformats files, re-stage the result; if a hook fails, surface it and stop. Do **not** bypass with `--no-verify` unless the user explicitly asks.
 - Probe the project type and run the relevant gate when one exists and is cheap: `package.json` → the test/lint/build script; `Cargo.toml` → `cargo test`/`cargo build`; `Makefile` → `make test`; `pyproject.toml`/`pytest` → tests; etc.
 - If tests fail, report the failure with output — do not commit on top of a broken build unless the user explicitly says to.
 
@@ -87,6 +93,7 @@ The difference isn't cosmetic: each commit is independently revertible, the hist
 ## Hard rules
 
 - Never commit secrets or files the user didn't intend to include.
+- Never commit unresolved conflict markers, and never bypass hooks with `--no-verify`, unless the user explicitly asks.
 - Never invent a commit convention that contradicts the repo's history.
 - Never push, force-push, or rewrite history unless the user explicitly asks.
 - If a check fails, stop and report — silence is not success.
@@ -131,7 +138,7 @@ Use this only when the repo already uses or enforces Conventional Commits, or wh
 - a `!` before the colon: `feat(api)!: drop support for v1 tokens`
 - a footer `BREAKING CHANGE: <description with migration steps>` (this token MUST be uppercase)
 
-**Footers** — `Token: value` or `Token #value`; use `-` instead of spaces in multi-word tokens (`Reviewed-by:`), except `BREAKING CHANGE`. Common ones: `Closes #123` / `Fixes #123` (link issues), `Refs:`, `DEPRECATED:`.
+**Footers** — `Token: value` or `Token #value`; use `-` instead of spaces in multi-word tokens (`Reviewed-by:`), except `BREAKING CHANGE`. Common ones: `Closes #123` / `Fixes #123` (link issues), `Refs:`, `Signed-off-by:` (DCO), `DEPRECATED:`.
 
 **SemVer mapping** — `fix:` → PATCH, `feat:` → MINOR, any breaking change → MAJOR. This is what tools like semantic-release / standard-version read to auto-bump versions and build the changelog.
 

@@ -90,4 +90,4 @@ cp -r ~/clean-commit/clean-commit ~/.claude/skills/clean-commit
 
 ## 许可证
 
-MIT —— 见 `LICENSE`（如需明确条款，正式大范围发布前补一个）。
+MIT —— 见 [`LICENSE`](LICENSE)。

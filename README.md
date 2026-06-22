@@ -90,4 +90,4 @@ To scope it to a single project instead of globally, point it at `<project>/.cla
 
 ## License
 
-MIT — see `LICENSE` (add one before publishing widely if you want explicit terms).
+MIT — see [`LICENSE`](LICENSE).

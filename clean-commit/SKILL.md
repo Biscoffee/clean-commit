@@ -34,6 +34,7 @@ Run the steps in order. Stop and surface the problem if any check fails — neve
 
 - Identify scratch/diagnostic/build artifacts that crept into the changes (probe scripts, `*.log`, `*.tmp`, debug dumps, editor junk). Don't stage them; suggest deleting or gitignoring.
 - **Flag large or binary files** being added (say, larger than a few MB): confirm they truly belong in git, and otherwise suggest Git LFS or a `.gitignore` entry — large blobs bloat the history permanently.
+- **Suggest `.gitignore` entries proactively** — if obvious language/tool artifacts keep showing up untracked (`node_modules/`, `__pycache__/`, `target/`, `dist/`, `.DS_Store`, IDE folders), recommend adding them to `.gitignore` so they stop reappearing in every status.
 
 ## 5. Split into logical commits
 
@@ -61,6 +62,8 @@ Run the steps in order. Stop and surface the problem if any check fails — neve
 
 - Commit by default; **push only when the user explicitly asks.**
 - If pushing from the default branch, create a feature branch first (step 1).
+- **Sync with the remote before pushing** — `git fetch` and check whether the branch is behind. If it is, integrate with `git pull --rebase` (not a merge bubble) and re-run the step 7 checks before pushing. A non-fast-forward is never a reason to force-push unless the user explicitly asks.
+- **Before opening a PR, offer to tidy a messy branch** — if the history is a string of `wip`/`fixup`/`typo` commits, propose squashing them into coherent commits (`git rebase -i --autosquash`). Propose only; never rewrite history without the user's consent.
 - For a PR, use the platform CLI if available (`gh pr create`, `glab mr create`). Write the PR body the same way as a commit body: what changed and why, how to verify.
 
 ## Examples
@@ -130,9 +133,9 @@ Use this only when the repo already uses or enforces Conventional Commits, or wh
 
 **Scope** — optional noun in parentheses naming the affected area, e.g. `feat(parser):`. May be omitted for cross-cutting changes.
 
-**Description (summary)** — follow Angular's rules: imperative present tense ("change", not "changed"/"changes"), no capitalized first letter, no trailing period. Keep it short.
+**Description (summary)** — follow Angular's rules: imperative present tense ("change", not "changed"/"changes"), no capitalized first letter, no trailing period. Keep it short — aim for ≤ 50 characters. A subject that needs "and" is usually two commits.
 
-**Body** — start one blank line after the description; explain *why* and *how verified*, in imperative present tense.
+**Body** — start one blank line after the description and wrap lines at ~72 characters; explain *why* and *how verified*, in imperative present tense.
 
 **Breaking changes** (→ SemVer MAJOR) — signal in **either** way:
 - a `!` before the colon: `feat(api)!: drop support for v1 tokens`

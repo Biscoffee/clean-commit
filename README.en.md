@@ -19,8 +19,8 @@ It binds to the **process**, not to anyone's setup — branch, remote, commit co
 - **Apply Conventional Commits precisely** — when `commitlint`/`commitizen`/etc. enforce it, writes messages per CC v1.0.0 / Angular / SemVer / RFC 2119
 - **Add footers when appropriate** — links issues (`Closes`/`Refs #`) from the branch name, and adds a DCO `Signed-off-by` when the repo requires it
 - **Verify before committing** — respects and runs pre-commit hooks, and probes `package.json`/`Cargo.toml`/`Makefile` to run tests or a build
-- **Push with restraint** — commits locally by default; push/PR only when you ask; suggests a feature branch (named in the repo's style) before pushing from the default branch
-- **Open PRs cleanly** — via `gh`/`glab`, with a description covering what changed, why, and how it was verified
+- **Push with restraint** — commits locally by default; push/PR only when you ask; suggests a feature branch (named in the repo's style) before pushing from the default branch; syncs with the remote (`pull --rebase`) before pushing instead of force-pushing
+- **Open PRs cleanly** — via `gh`/`glab`, with a description covering what changed, why, and how it was verified; offers to squash a messy WIP history before opening the PR
 
 ## The 8-step workflow
 

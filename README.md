@@ -19,8 +19,8 @@
 - **约定式提交精确执行**：检测到 `commitlint`/`commitizen` 等强制约定时，按 CC v1.0.0 / Angular / SemVer / RFC 2119 生成规范 message
 - **按需补 footer**：分支名带 Issue 号就关联 `Closes`/`Refs #`；仓库要求 DCO 时加 `Signed-off-by`
 - **提交前验证**：尊重并跑 pre-commit 钩子；探测 `package.json`/`Cargo.toml`/`Makefile` 等跑测试或构建
-- **克制地推送**：默认只本地提交；push/PR 要你明确开口；主分支上要推先建议建特性分支（按仓库命名习惯）
-- **规范开 PR**：用 `gh`/`glab`，PR 描述讲清改了什么·为什么·怎么验证
+- **克制地推送**：默认只本地提交；push/PR 要你明确开口；主分支上要推先建议建特性分支（按仓库命名习惯）；push 前先与远程同步（`pull --rebase`），绝不靠 force push 解决
+- **规范开 PR**：用 `gh`/`glab`，PR 描述讲清改了什么·为什么·怎么验证；开 PR 前可提议把凌乱的 WIP 提交 squash 整理
 
 ## 8 步流程
 

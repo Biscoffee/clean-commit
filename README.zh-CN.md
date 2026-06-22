@@ -58,20 +58,21 @@ clean-commit:
 
 克隆到任意位置，再把它链接进你的 skills 目录，让 Claude Code 能看到：
 
+skill 本体放在 `clean-commit/` 子文件夹里，所以安装就是把这个文件夹放进你的 skills 目录：
+
 ```sh
 git clone https://github.com/Biscoffee/clean-commit.git ~/clean-commit
 
-# 方式 A —— 只软链接 skill 文件（保持 skills 目录干净）
-mkdir -p ~/.claude/skills/clean-commit
-ln -s ~/clean-commit/SKILL.md ~/.claude/skills/clean-commit/SKILL.md
+# 方式 A —— 软链接整个 skill 文件夹（即插即用，推荐）
+ln -s ~/clean-commit/clean-commit ~/.claude/skills/clean-commit
 
-# 方式 B —— 软链接整个文件夹
-ln -s ~/clean-commit ~/.claude/skills/clean-commit
+# 方式 B —— 直接复制而非软链接
+cp -r ~/clean-commit/clean-commit ~/.claude/skills/clean-commit
 ```
 
 然后直接说「提交一下」/「commit this」，或用 `/clean-commit` 显式调用。
 
-若只想在单个项目里用而非全局，把它链接进 `<项目>/.claude/skills/` 而不是 `~/.claude/skills/`。
+若只想在单个项目里用而非全局，把它指向 `<项目>/.claude/skills/clean-commit` 而不是 `~/.claude/skills/clean-commit`。
 
 ## 它不会做什么
 
@@ -83,7 +84,7 @@ ln -s ~/clean-commit ~/.claude/skills/clean-commit
 
 ## 文件
 
-- [`SKILL.md`](SKILL.md) —— skill 本体（frontmatter + 流程 + 约定式提交附录）
+- [`clean-commit/SKILL.md`](clean-commit/SKILL.md) —— skill 本体（frontmatter + 流程 + 约定式提交附录）
 - [`design-notes.md`](design-notes.md) —— 设计思考：Skill 是什么、私人 vs 可分发 Skill、为何面向泛程序员
 - [`README.md`](README.md) —— English README
 

@@ -58,20 +58,21 @@ That behavior is grounded in the actual standards, not guesswork:
 
 Clone anywhere, then make it visible to Claude Code by linking it into your skills directory:
 
+The skill lives in the `clean-commit/` subfolder, so installing is just dropping that folder into your skills directory:
+
 ```sh
 git clone https://github.com/Biscoffee/clean-commit.git ~/clean-commit
 
-# option A — symlink just the skill file (keeps your skills dir clean)
-mkdir -p ~/.claude/skills/clean-commit
-ln -s ~/clean-commit/SKILL.md ~/.claude/skills/clean-commit/SKILL.md
+# option A — symlink the skill folder (drop-in; recommended)
+ln -s ~/clean-commit/clean-commit ~/.claude/skills/clean-commit
 
-# option B — symlink the whole folder
-ln -s ~/clean-commit ~/.claude/skills/clean-commit
+# option B — copy it instead of linking
+cp -r ~/clean-commit/clean-commit ~/.claude/skills/clean-commit
 ```
 
 Then just say "commit this" / "提交一下", or invoke it explicitly with `/clean-commit`.
 
-To scope it to a single project instead of globally, link it into `<project>/.claude/skills/` instead of `~/.claude/skills/`.
+To scope it to a single project instead of globally, point it at `<project>/.claude/skills/clean-commit` instead of `~/.claude/skills/clean-commit`.
 
 ## What it will not do
 
@@ -83,7 +84,7 @@ To scope it to a single project instead of globally, link it into `<project>/.cl
 
 ## Files
 
-- [`SKILL.md`](SKILL.md) — the skill itself (frontmatter + workflow + Conventional Commits appendix)
+- [`clean-commit/SKILL.md`](clean-commit/SKILL.md) — the skill itself (frontmatter + workflow + Conventional Commits appendix)
 - [`design-notes.md`](design-notes.md) — the design thinking: what a Skill is, private vs distributable skills, and why this one targets general programmers
 - [`README.zh-CN.md`](README.zh-CN.md) — 中文说明
 

@@ -125,6 +125,16 @@ cp -r ~/clean-commit/clean-commit ~/.claude/skills/clean-commit
 
 若只想在单个项目里用而非全局，把它指向 `<项目>/.claude/skills/clean-commit` 而不是 `~/.claude/skills/clean-commit`。
 
+### Codex 也能用
+
+Codex 的 Agent Skills 用的是同一套 `SKILL.md` 格式，所以**同一个文件夹**软链进 Codex 的 skills 目录即可，正文无需任何改动：
+
+```sh
+ln -s ~/clean-commit/clean-commit ~/.agents/skills/clean-commit
+```
+
+差别只在调用语法：在 Codex 里用 `$clean-commit` 或 `/skills` 选择器，或让它按 `description` 自动触发。仓库级则放 `<项目>/.agents/skills/clean-commit`。
+
 ## 它不会做什么
 
 - 提交密钥，或你没打算包含的文件

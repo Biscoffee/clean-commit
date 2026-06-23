@@ -125,6 +125,16 @@ Then just say "commit this" / "提交一下", or invoke it explicitly with `/cle
 
 To scope it to a single project instead of globally, point it at `<project>/.claude/skills/clean-commit` instead of `~/.claude/skills/clean-commit`.
 
+### Works in Codex too
+
+Codex Agent Skills use the same `SKILL.md` format, so the **same folder** symlinks straight into Codex's skills directory with no changes to the content:
+
+```sh
+ln -s ~/clean-commit/clean-commit ~/.agents/skills/clean-commit
+```
+
+Only the invocation differs: in Codex use `$clean-commit` or the `/skills` picker, or let it trigger automatically from the `description`. For a single repo, use `<project>/.agents/skills/clean-commit`.
+
 ## What it will not do
 
 - Commit secrets, or files you didn't intend to include
